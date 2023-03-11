@@ -3,6 +3,7 @@ import { useState } from 'react';
 import {AiFillEyeInvisible, AiFillEye } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
 import OAuth from '../components/OAuth';
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 const Signin = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -18,6 +19,22 @@ const Signin = () => {
       [e.target.id]: e.target.value,
     }))
   }
+  function onSubmit(e){
+    e.preventDefault()
+  }
+
+  const auth = getAuth();
+  signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      // Signed in 
+      const user = userCredential.user;
+      // ...
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+    });
+    
   return (
     <section>
       <h1 className='text-3xl text-center mt-6 font-bold'>Sign In</h1>
@@ -28,7 +45,7 @@ const Signin = () => {
           <img src={Login} alt="Key" className='w-full' />
         </div>
         <div className='w-full md:w-[67%] lg:w-[40%] lg:ml-20'>
-          <form >
+          <form onSubmit={onSubmit}>
             <input 
               type="email" id='email'
               value={email} 

@@ -1,8 +1,12 @@
 import { Login } from '../assets';
 import { useState } from 'react';
 import {AiFillEyeInvisible, AiFillEye } from 'react-icons/ai';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { db } from '../firebase';
 import OAuth from '../components/OAuth';
+import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { toast } from 'react-toastify';
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -12,6 +16,8 @@ const Signup = () => {
     password:""
   });
   const { name, email, password } = formData;
+  const navigate = useNavigate()
+
   function onChange(e){
     // console.log(e.target.value);
     setFormData((prevState)=>({
@@ -19,6 +25,30 @@ const Signup = () => {
       [e.target.id]: e.target.value,
     }))
   }
+
+  async function onSubmit(e){
+    e.preventDefault();
+
+    try {
+      const auth = getAuth();
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      
+      updateProfile (auth.currentUser, {
+        displayName: name
+      })
+      const user = userCredential.user 
+      const formDataCopy = {...formData}
+      delete formDataCopy.password
+      formDataCopy.timestamp = serverTimestamp();
+
+      await setDoc(doc(db, "users", user.uid), formDataCopy)
+      toast.success("Sign up was successful.")
+      navigate('/');
+    } catch (error) {
+      toast.error("Something went wrong with the registration")
+    }
+  }
+
   return (
     <section>
       <h1 className='text-3xl text-center mt-6 font-bold'>Sign Up</h1>
@@ -29,7 +59,7 @@ const Signup = () => {
           <img src={Login} alt="Key" className='w-full' />
         </div>
         <div className='w-full md:w-[67%] lg:w-[40%] lg:ml-20'>
-          <form >
+          <form onSubmit={onSubmit} >
             <input 
                 type="text" id='name'
                 value={name} 
