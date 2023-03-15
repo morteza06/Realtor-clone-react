@@ -12,19 +12,20 @@ const OAuth = () => {
       const auth = getAuth()
       const provider = new GoogleAuthProvider()
       const result = await signInWithPopup(auth, provider)
-      const user = result.user
+      const user = result.user;
       // check for the user
 
-      const docRef = doc(db, 'users', user.uid )
+      const docRef = doc(db, 'users', user.uid );
       const docSnap = await getDoc(docRef);
 
-      if(!docSnap.exists()){
+      if(!docSnap.exists()) {
         await setDoc(docRef, {
           name: user.displayName,
           email: user.email,
           timestamp: serverTimestamp(),
         });
       } 
+      toast.success("Successful to connect.");
       navigate("/");
 
     } catch (error) {

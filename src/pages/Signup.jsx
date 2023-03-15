@@ -16,7 +16,7 @@ const Signup = () => {
     password:""
   });
   const { name, email, password } = formData;
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   function onChange(e){
     // console.log(e.target.value);
@@ -34,16 +34,16 @@ const Signup = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       
       updateProfile (auth.currentUser, {
-        displayName: name
-      })
-      const user = userCredential.user 
-      const formDataCopy = {...formData}
-      delete formDataCopy.password
+        displayName: name,
+      });
+      const user = userCredential.user;
+      const formDataCopy = {...formData};
+      delete formDataCopy.password;
       formDataCopy.timestamp = serverTimestamp();
 
       await setDoc(doc(db, "users", user.uid), formDataCopy)
-      // toast.success("Sign up was successful.")
-      // navigate('/');
+      toast.success("Sign up was successful.")
+      navigate('/');
     } catch (error) {
       toast.error("Something went wrong with the registration")
     }
